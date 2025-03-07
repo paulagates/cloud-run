@@ -50,7 +50,7 @@ Acesso pela URL: https://cloud-run-305796103700.southamerica-east1.run.app
 # Rotas
 
 ```
-GET /weather?cep=XXXXX-XXX
+GET /weather?cep=XXXXXXXX
 ```
 Retorna o clima atual para o CEP fornecido.
 
