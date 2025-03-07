@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	godotenv.Load("../../.env")
 	weatherService := service.NewWeatherService()
 	api := api.NewWeatherHandler(weatherService)
 	http.HandleFunc("GET /", api.GetWeather)

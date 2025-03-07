@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -32,6 +33,7 @@ func (c *weatherService) FindLocation(cepStr string) (Address, error) {
 	}
 	_, err := strconv.Atoi(cepStr)
 	if err != nil {
+		log.Println(err)
 		return Address{}, ErrInvalidZipcode
 	}
 	url := fmt.Sprintf("https://viacep.com.br/ws/%v/json/", cepStr)
@@ -41,13 +43,14 @@ func (c *weatherService) FindLocation(cepStr string) (Address, error) {
 	client := &http.Client{Transport: transport}
 	res, err := client.Get(url)
 	if err != nil {
-		return Address{}, err
+		log.Println(err)
+		return Address{}, ErrInvalidZipcode
 	}
 	defer res.Body.Close()
 	var address Address
 	err = json.NewDecoder(res.Body).Decode(&address)
 	if err != nil {
-		return Address{}, err
+		return Address{}, ErrInvalidZipcode
 	}
 
 	if address.Cep == "" {
@@ -57,6 +60,9 @@ func (c *weatherService) FindLocation(cepStr string) (Address, error) {
 }
 
 func (c *weatherService) GetCurrentWeather(city string) (Weather, error) {
+	if city == "" {
+		return Weather{}, ErrWeatherAPI
+	}
 	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", os.Getenv("WEATHER_API_KEY"), url.QueryEscape(city))
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -64,13 +70,15 @@ func (c *weatherService) GetCurrentWeather(city string) (Weather, error) {
 	client := &http.Client{Transport: transport}
 	res, err := client.Get(url)
 	if err != nil {
-		return Weather{}, err
+		log.Println(err)
+		return Weather{}, ErrWeatherAPI
 	}
 	defer res.Body.Close()
 	var responseWeather ResponseWeather
 	err = json.NewDecoder(res.Body).Decode(&responseWeather)
 	if err != nil {
-		return Weather{}, err
+		log.Println(err)
+		return Weather{}, ErrWeatherAPI
 	}
 	responseWeather.Current.TempK = responseWeather.Current.TempC + 273
 	return responseWeather.Current, nil

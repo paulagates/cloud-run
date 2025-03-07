@@ -10,3 +10,5 @@ services:
       - ./.env:/app/.env
       - .:/app 
     command: go test -v ./... 
+    restart: "no"
+

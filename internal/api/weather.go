@@ -18,17 +18,14 @@ func (we *WeatherHandler) GetWeather(w http.ResponseWriter, r *http.Request) {
 	viacep, err := we.service.FindLocation(cep)
 	if err != nil {
 		if err == service.ErrZipcodeNotFound {
-			log.Println(err)
 			http.Error(w, service.ErrZipcodeNotFound.Error(), http.StatusNotFound)
 			return
 		}
-		log.Println(err)
 		http.Error(w, service.ErrInvalidZipcode.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	weather, err := we.service.GetCurrentWeather(viacep.Localidade)
 	if err != nil {
-		log.Println(err)
 		http.Error(w, service.ErrWeatherAPI.Error(), http.StatusInternalServerError)
 		return
 	}
