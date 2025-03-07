@@ -1,0 +1,12 @@
+services:
+  tester:
+    build:
+      context: .
+      target: tester 
+    container_name: weather-tester
+    env_file:
+      - .env
+    volumes:
+      - ./.env:/app/.env
+      - .:/app 
+    command: go test -v ./... 
